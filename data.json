@@ -1,0 +1,200 @@
+[
+  {
+    "id": "https://api.dev.nva.aws.unit.no/publication/item1",
+    "entityDescription": {
+      "reference": {
+        "publicationContext": {
+          "type": "Book",
+          "scientificValue": "LevelOne"
+        },
+        "publicationInstance": {
+          "type": "BookAnthology"
+        }
+      }
+    }
+  },
+  {
+    "id": "https://api.dev.nva.aws.unit.no/publication/item2",
+    "entityDescription": {
+      "reference": {
+        "publicationContext": {
+          "id": "https://api.dev.nva.aws.unit.no/publication/item1",
+          "type": "Anthology",
+          "scientificValue": "LevelOne"
+        },
+        "publicationInstance": {
+          "type": "AcademicChapter"
+        }
+      }
+    }
+  },
+  {
+    "id": "https://api.dev.nva.aws.unit.no/publication/item3",
+    "entityDescription": {
+      "reference": {
+        "publicationContext": {
+          "type": "Book",
+          "scientificValue": "Unassigned"
+        },
+        "publicationInstance": {
+          "type": "BookAnthology"
+        }
+      }
+    }
+  },
+  {
+    "id": "https://api.dev.nva.aws.unit.no/publication/item4",
+    "entityDescription": {
+      "reference": {
+        "publicationContext": {
+          "id": "https://api.dev.nva.aws.unit.no/publication/item1"
+        }
+      }
+    }
+  },
+  {
+    "id": "https://api.dev.nva.aws.unit.no/publication/item5",
+    "entityDescription": {
+      "reference": {
+        "publicationContext": {
+          "id": "https://api.dev.nva.aws.unit.no/publication/item3",
+          "type": "Anthology",
+          "scientificValue": "LevelOne"
+        }
+      }
+    }
+  },
+  {
+    "id": "https://api.dev.nva.aws.unit.no/publication/item6",
+    "entityDescription": {
+      "reference": {
+        "publicationContext": {
+          "id": "https://api.dev.nva.aws.unit.no/publication/item1",
+          "type": "Anthology",
+          "scientificValue": "LevelOne"
+        },
+        "publicationInstance": {
+          "type": "AcademicChapter"
+        }
+      }
+    }
+  },
+  {
+    "id": "https://api.dev.nva.aws.unit.no/publication/item7",
+    "entityDescription": {
+      "reference": {
+        "publicationContext": {
+          "id": "https://api.dev.nva.aws.unit.no/publication/item1",
+          "type": "Anthology",
+          "scientificValue": "LevelTwo"
+        },
+        "publicationInstance": {
+          "type": "AcademicChapter"
+        }
+      }
+    }
+  },
+  {
+    "id": "https://api.dev.nva.aws.unit.no/publication/item8",
+    "entityDescription": {
+      "reference": {
+        "publicationContext": {
+          "id": "https://api.dev.nva.aws.unit.no/publication/item1",
+          "type": "Anthology",
+          "scientificValue": "Unassigned"
+        },
+        "publicationInstance": {
+          "type": "AcademicChapter"
+        }
+      }
+    }
+  },
+  {
+    "id": "https://api.dev.nva.aws.unit.no/publication/item9",
+    "entityDescription": {
+      "reference": {
+        "publicationContext": {
+          "id": "https://api.dev.nva.aws.unit.no/publication/item3",
+          "type": "Anthology",
+          "scientificValue": "LevelOne"
+        },
+        "publicationInstance": {
+          "type": "AcademicChapter"
+        }
+      }
+    }
+  },
+  {
+    "id": "https://api.dev.nva.aws.unit.no/publication/item10",
+    "entityDescription": {
+      "reference": {
+        "publicationContext": {
+          "id": "https://api.dev.nva.aws.unit.no/publication/item3",
+          "type": "Anthology",
+          "scientificValue": "LevelTwo"
+        },
+        "publicationInstance": {
+          "type": "AcademicChapter"
+        }
+      }
+    }
+  },
+  {
+    "id": "https://api.dev.nva.aws.unit.no/publication/item11",
+    "entityDescription": {
+      "reference": {
+        "publicationContext": {
+          "id": "https://api.dev.nva.aws.unit.no/publication/item3",
+          "type": "Anthology",
+          "scientificValue": "Unassigned"
+        },
+        "publicationInstance": {
+          "type": "AcademicChapter"
+        }
+      }
+    }
+  },
+  {
+    "id": "https://api.dev.nva.aws.unit.no/publication/item12",
+    "entityDescription": {
+      "reference": {
+        "publicationContext": {
+          "id": "https://api.dev.nva.aws.unit.no/publication/item13",
+          "type": "Anthology",
+          "scientificValue": "LevelOne"
+        },
+        "publicationInstance": {
+          "type": "AcademicChapter"
+        }
+      }
+    }
+  },
+  {
+    "id": "https://api.dev.nva.aws.unit.no/publication/item12",
+    "entityDescription": {
+      "reference": {
+        "publicationContext": {
+          "type": "Book",
+          "scientificValue": "LevelOne"
+        },
+        "publicationInstance": {
+          "type": "Anthology"
+        }
+      }
+    }
+  },
+  {
+    "id": "https://api.dev.nva.aws.unit.no/publication/item14",
+    "entityDescription": {
+      "reference": {
+        "publicationContext": {
+          "type": "Book",
+          "scientificValue": "LevelOne"
+        },
+        "publicationInstance": {
+          "type": "BookAnthology"
+        }
+      }
+    }
+  }
+]

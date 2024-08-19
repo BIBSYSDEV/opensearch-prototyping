@@ -1,0 +1,70 @@
+{
+  "properties": {
+    "id": { "type": "keyword" },
+    "child_to_parent": {
+      "type": "join",
+      "relations": {
+        "parentLabel": "childLabel"
+      }
+    },
+    "entityDescription": {
+      "type": "nested",
+      "include_in_parent": true,
+      "properties": {
+        "abstract": {
+          "type": "text"
+        },
+        "contributors": {
+          "type": "nested",
+          "include_in_parent": true,
+          "properties": {
+            "identity": {
+              "type": "nested",
+              "include_in_parent": true
+            }
+          }
+        },
+        "reference": {
+          "type": "nested",
+          "include_in_parent": true,
+          "properties": {
+            "publicationInstance": {
+              "type": "nested",
+              "include_in_parent": true,
+              "properties": {
+                "type": { "type": "keyword" },
+                "pages": {
+                  "type": "object",
+                  "properties": {
+                    "pages": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "publicationContext": {
+              "type": "nested",
+              "include_in_parent": true,
+              "properties": {
+                "id": {
+                  "type": "keyword"
+                },
+                "scientificValue": {
+                  "type": "keyword"
+                },
+                "publisher": {
+                  "type": "nested",
+                  "include_in_parent": true
+                },
+                "entityDescription": {
+                  "type": "flat_object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

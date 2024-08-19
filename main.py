@@ -1,0 +1,210 @@
+from opensearchpy import NotFoundError, OpenSearch
+import json
+
+# Create the client with SSL/TLS disabled for local testing
+host = "localhost"
+port = 9200
+auth = ("admin", "mysupersecret123Password!")
+client = OpenSearch(
+    hosts=[{"host": host, "port": port}],
+    http_auth=auth,
+    use_ssl=False,
+    verify_certs=False,
+)
+
+# Names of test index and labels
+index_name = "tempindex1234"
+parent_label = "parentLabel"
+child_label = "childLabel"
+
+
+def create_index(index_name):
+    index_body = {
+        "settings": {"index": {"number_of_shards": 1, "number_of_replicas": 0}}
+    }
+    response = client.indices.create(index_name, body=index_body)
+    print(f"Created index: {response}")
+
+
+def delete_index(index_name):
+    try:
+        response = client.indices.delete(index_name)
+        print(f"Deleted index: {response}")
+    except NotFoundError as e:
+        print(f"Ignoring NotFoundError: {e}")
+
+
+def insert_document(index_name, document, shard_id="1"):
+    doc_id = document.get("id")
+    print()
+    print(f"Adding document: {doc_id=}")
+
+    response = client.index(
+        index=index_name,
+        body=document,
+        refresh=True,
+        id=doc_id,
+        routing=shard_id,
+    )
+
+    print("Response:")
+    print(json.dumps(response, indent=2))
+
+
+def search_documents(index_name, query):
+    response = client.search(body=query, index=index_name)
+    print()
+    print("Search query:")
+    print(json.dumps(query, indent=2))
+    print("Search results:")
+    print(json.dumps(response, indent=2))
+
+
+def create_mappings(index_name, mappings):
+    response = client.indices.put_mapping(index=index_name, body=mappings)
+    print(f"Created mapping: {response}")
+
+
+def parse_json(filename: str):
+    with open(filename) as file:
+        return json.load(file)
+
+
+def generate_documents(input_file, output_file, parent_label, child_label):
+    """
+    Process example documents and add derived fields for parent-child relationships.
+    """
+    documents = parse_json(input_file)
+    for document in documents:
+
+        # Get the nested field "entityDescription.reference.publicationContext.id" if it exists
+        entity_description = document.get("entityDescription", {})
+        reference = entity_description.get("reference", {})
+        publication_context = reference.get("publicationContext", {})
+        parent_id = publication_context.get("id", None)
+
+        if parent_id:
+            document["child_to_parent"] = {"name": child_label, "parent": parent_id}
+        else:
+            document["child_to_parent"] = {"name": parent_label, "parent": parent_id}
+
+    with open(output_file, "w") as file:
+        json.dump(documents, file, indent=2)
+
+
+def build_index(index_name, documents, mappings):
+    print()
+    delete_index(index_name)
+
+    print()
+    create_index(index_name)
+
+    print()
+    create_mappings(index_name, mappings)
+
+    for document in documents:
+        print()
+        print("Adding document:")
+        print(json.dumps(document, indent=2))
+        self_id = document.get("id")
+        print("Using ID = ", self_id)
+
+        response = client.index(
+            index=index_name, body=document, refresh=True, id=self_id, routing="1"
+        )
+
+        print("Response:")
+        print(json.dumps(response, indent=2))
+
+
+def getAll():
+    """
+    This query will return all documents in the index.
+    """
+    search_query = {"query": {"match_all": {}}}
+    search_documents(index_name, search_query)
+
+
+def getInvalidChildren():
+    """
+    This query will return all child documents that:
+    - Belong to a parent document with scientificValue="Unassigned"
+    - Are not themselves set to scientificValue="Unassigned"
+    """
+    search_query = {
+        "size": 10,
+        "query": {
+            "bool": {
+                "filter": [
+                    {
+                        "has_parent": {
+                            "parent_type": "parentLabel",
+                            "query": {
+                                "term": {
+                                    "entityDescription.reference.publicationContext.scientificValue": "Unassigned"
+                                }
+                            },
+                        }
+                    },
+                ],
+                "must_not": [
+                    {
+                        "term": {
+                            "entityDescription.reference.publicationContext.scientificValue": "Unassigned"
+                        }
+                    }
+                ],
+            },
+        },
+    }
+    search_documents(index_name, search_query)
+
+
+def getInvalidParents():
+    """
+    This query will find all parent documents that:
+    - Are of type "Anthology" or "BookAnthology"
+    - Do not have any child documents linked to them
+    """
+    search_query = {
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "bool": {
+                            "should": [
+                                {
+                                    "term": {
+                                        "entityDescription.reference.publicationInstance.type": "Anthology"
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "entityDescription.reference.publicationInstance.type": "BookAnthology"
+                                    }
+                                },
+                            ],
+                            "minimum_should_match": 1,
+                        }
+                    }
+                ],
+                "must_not": [
+                    {"has_child": {"type": "childLabel", "query": {"match_all": {}}}}
+                ],
+            }
+        }
+    }
+    search_documents(index_name, search_query)
+
+
+if __name__ == "__main__":
+    # Define example data and initialize the index
+    generate_documents("data.json", "output.json", parent_label, child_label)
+    documents = parse_json("output.json")
+    mappings = parse_json("mappings.json")
+    build_index(index_name, documents, mappings)
+
+    # Run example queries
+    getAll()
+    getInvalidChildren()
+    getInvalidParents()
