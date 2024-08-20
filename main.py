@@ -125,7 +125,7 @@ def getAll():
     search_documents(index_name, search_query)
 
 
-def getInvalidChildren():
+def getParentsWithInvalidChildren():
     """
     This query will find child documents that have a mismatch between their
     parent document's scientificValue field. Returns child documents that:
@@ -139,33 +139,45 @@ def getInvalidChildren():
             "bool": {
                 "must": [
                     {
-                        "has_parent": {
-                            "parent_type": "parentLabel",
-                            "query": {
-                                "bool": {
-                                    "should": [
-                                        {
-                                            "term": {
-                                                "entityDescription.reference.publicationInstance.type": "BookAnthology"
-                                            }
-                                        },
-                                        {
-                                            "term": {
-                                                "entityDescription.reference.publicationInstance.type": "TextBook"
-                                            }
-                                        },
-                                    ],
-                                    "minimum_should_match": 1,
-                                }
-                            },
+                        "bool": {
+                            "should": [
+                                {
+                                    "term": {
+                                        "entityDescription.reference.publicationInstance.type": "BookAnthology"
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "entityDescription.reference.publicationInstance.type": "TextBook"
+                                    }
+                                },
+                            ],
+                            "minimum_should_match": 1,
                         }
                     },
                     {
-                        "has_parent": {
-                            "parent_type": "parentLabel",
+                        "bool": {
+                            "should": [
+                                {
+                                    "term": {
+                                        "entityDescription.reference.publicationContext.scientificValue": "Unassigned"
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "entityDescription.reference.publicationContext.scientificValue": "LevelZero"
+                                    }
+                                },
+                            ],
+                            "minimum_should_match": 1,
+                        }
+                    },
+                    {
+                        "has_child": {
+                            "type": "childLabel",
                             "query": {
                                 "bool": {
-                                    "should": [
+                                    "must_not": [
                                         {
                                             "term": {
                                                 "entityDescription.reference.publicationContext.scientificValue": "Unassigned"
@@ -177,21 +189,9 @@ def getInvalidChildren():
                                             }
                                         },
                                     ],
-                                    "minimum_should_match": 1,
-                                }
+                                },
                             },
-                        }
-                    },
-                ],
-                "must_not": [
-                    {
-                        "term": {
-                            "entityDescription.reference.publicationContext.scientificValue": "Unassigned"
-                        }
-                    },
-                    {
-                        "term": {
-                            "entityDescription.reference.publicationContext.scientificValue": "LevelZero"
+                            "inner_hits": {},
                         }
                     },
                 ],
@@ -201,7 +201,7 @@ def getInvalidChildren():
     search_documents(index_name, search_query)
 
 
-def getInvalidParents():
+def getParentsWithoutChildren():
     """
     This query finds parent documents where we expect child documents to exist,
     but where no child documents are linked. Returns parent documents that:
@@ -231,7 +231,13 @@ def getInvalidParents():
                     }
                 ],
                 "must_not": [
-                    {"has_child": {"type": "childLabel", "query": {"match_all": {}}}}
+                    {
+                        "has_child": {
+                            "type": "childLabel",
+                            "query": {"match_all": {}},
+                            "inner_hits": {},
+                        }
+                    },
                 ],
             }
         }
@@ -248,5 +254,5 @@ if __name__ == "__main__":
 
     # Run example queries
     getAll()
-    getInvalidChildren()
-    getInvalidParents()
+    getParentsWithInvalidChildren()
+    getParentsWithoutChildren()
