@@ -127,21 +127,57 @@ def getAll():
 
 def getInvalidChildren():
     """
-    This query will return all child documents that:
-    - Belong to a parent document with scientificValue="Unassigned"
-    - Are not themselves set to scientificValue="Unassigned"
+    This query will find child documents that have a mismatch between their
+    parent document's scientificValue field. Returns child documents that:
+    - Have a parent document of type "BookAnthology" or "Textbook"
+    - Have a parent document with scientificValue="Unassigned" or "LevelZero"
+    - Are not themselves set to scientificValue="Unassigned" or "LevelZero"
     """
     search_query = {
         "size": 10,
         "query": {
             "bool": {
-                "filter": [
+                "must": [
                     {
                         "has_parent": {
                             "parent_type": "parentLabel",
                             "query": {
-                                "term": {
-                                    "entityDescription.reference.publicationContext.scientificValue": "Unassigned"
+                                "bool": {
+                                    "should": [
+                                        {
+                                            "term": {
+                                                "entityDescription.reference.publicationInstance.type": "BookAnthology"
+                                            }
+                                        },
+                                        {
+                                            "term": {
+                                                "entityDescription.reference.publicationInstance.type": "TextBook"
+                                            }
+                                        },
+                                    ],
+                                    "minimum_should_match": 1,
+                                }
+                            },
+                        }
+                    },
+                    {
+                        "has_parent": {
+                            "parent_type": "parentLabel",
+                            "query": {
+                                "bool": {
+                                    "should": [
+                                        {
+                                            "term": {
+                                                "entityDescription.reference.publicationContext.scientificValue": "Unassigned"
+                                            }
+                                        },
+                                        {
+                                            "term": {
+                                                "entityDescription.reference.publicationContext.scientificValue": "LevelZero"
+                                            }
+                                        },
+                                    ],
+                                    "minimum_should_match": 1,
                                 }
                             },
                         }
@@ -152,7 +188,12 @@ def getInvalidChildren():
                         "term": {
                             "entityDescription.reference.publicationContext.scientificValue": "Unassigned"
                         }
-                    }
+                    },
+                    {
+                        "term": {
+                            "entityDescription.reference.publicationContext.scientificValue": "LevelZero"
+                        }
+                    },
                 ],
             },
         },
@@ -162,8 +203,9 @@ def getInvalidChildren():
 
 def getInvalidParents():
     """
-    This query will find all parent documents that:
-    - Are of type "Anthology" or "BookAnthology"
+    This query finds parent documents where we expect child documents to exist,
+    but where no child documents are linked. Returns parent documents that:
+    - Are of type "BookAnthology" or "TextBook"
     - Do not have any child documents linked to them
     """
     search_query = {
@@ -175,12 +217,12 @@ def getInvalidParents():
                             "should": [
                                 {
                                     "term": {
-                                        "entityDescription.reference.publicationInstance.type": "Anthology"
+                                        "entityDescription.reference.publicationInstance.type": "BookAnthology"
                                     }
                                 },
                                 {
                                     "term": {
-                                        "entityDescription.reference.publicationInstance.type": "BookAnthology"
+                                        "entityDescription.reference.publicationInstance.type": "TextBook"
                                     }
                                 },
                             ],
